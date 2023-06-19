@@ -1,9 +1,21 @@
+extensions [csv]
 patches-own [new-color]
+globals[
+  datainput
+]
+
 to setup
   clear-all
   reset-ticks
+  file-close
+  file-open "input.csv"
+  set datainput csv:from-file "input.csv"
+
   ask patches [
     set pcolor one-of [white pink]
+    if (item pxcor item pycor datainput) = 1 [
+      set pcolor pink
+    ]
   ]
 end
 
@@ -31,8 +43,8 @@ end
 GRAPHICS-WINDOW
 210
 10
-628
-429
+1218
+1019
 -1
 -1
 10.0
@@ -45,10 +57,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--20
-20
--20
-20
+0
+99
+0
+99
 0
 0
 1
@@ -448,10 +460,19 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.2.2
+NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="exp1" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="100"/>
+    <exitCondition>count patches with [pcolor = pink] = 0</exitCondition>
+    <metric>count patches with [pcolor = pink]</metric>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default

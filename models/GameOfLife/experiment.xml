@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE experiments SYSTEM "behaviorspace.dtd">
+<experiments>
+  <experiment name="exp1" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="100"/>
+    <exitCondition>count patches with [pcolor = pink] = 0</exitCondition>
+    <metric>count patches with [pcolor = pink]</metric>
+  </experiment>
+</experiments>
