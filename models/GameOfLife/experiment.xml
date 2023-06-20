@@ -24,7 +24,7 @@
       <value value="99"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="input-name">
-      <value value="&quot;input.csv&quot;"/>
+      <value value="&quot;INPUT&quot;"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
