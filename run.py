@@ -32,8 +32,8 @@ def create_experiment_netlogo(INPUT_NAME):
             exp_file.truncate(0)
             exp_file.write(data)
 
-# input_names = ['10x10board.csv', '100x100board.csv', '1000x1000board.csv']
-input_names = ['10x10board.csv', '100x100board.csv']
+input_names = ['10x10board.csv', '100x100board.csv', '1000x1000board.csv']
+# input_names = ['10x10board.csv', '100x100board.csv']
 # input_names = ['1000x1000board.csv']
 for input in input_names:
     create_experiment_netlogo(input)
