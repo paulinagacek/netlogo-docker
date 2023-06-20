@@ -7,6 +7,7 @@ EXPERIMENT_LAYOUT_FILE='exp_layout.xml'
 EXPERIMENT_FILE='experiment.xml'
 
 MAX_ITER=1000 # max nr of iterations
+REPETITIONS = 1
 
 directory = os.getcwd()
 
@@ -25,6 +26,7 @@ def create_experiment_netlogo():
         data = data.replace('MAX_ROW_NR', str(MAX_ROW_NR))
         data = data.replace('MAX_COL_NR', str(MAX_COL_NR))
         data = data.replace('INPUT', str(INPUT_NAME))
+        data = data.replace('REPETITIONS', str(REPETITIONS))
 
         with open(os.path.join(MODEL_FOLDER, EXPERIMENT_FILE), 'w') as exp_file:
             exp_file.truncate(0)
@@ -34,14 +36,14 @@ input_names = ['10x10board.csv', '100x100board.csv', '1000x1000board.csv']
 for INPUT_NAME in input_names:
     create_experiment_netlogo()
 
-    REPETITIONS = 1
     start = time.time()
-    for idx in range(REPETITIONS):
-        subprocess.run(["./NetLogo 6.3.0/NetLogo_Console","--headless", 
-            "--model", "/opt/models/NLModel.nlogo" ,
-            "--setup-file", "/opt/models/experiment.xml" ,
-            "--table", "models/table-output.csv ",
-            "--spreadsheet", "models/table-output.csv"],  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(["./NetLogo 6.3.0/NetLogo_Console","--headless", 
+        "--model", "/opt/models/NLModel.nlogo" ,
+        "--setup-file", os.path.join(MODEL_FOLDER, EXPERIMENT_FILE) ,
+        "--table", "models/table-output.csv ",
+        "--spreadsheet", "models/table-output.csv"],  
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
 
     end = time.time()
     print((end - start)/REPETITIONS)

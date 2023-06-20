@@ -19,10 +19,7 @@ USER root
 RUN apt-get install -y python3 && pip3 install pandas
 
 COPY . /opt
-# COPY models /opt/models
 
 RUN mv /opt/models/$MODEL_FOLDER/model.nlogo /opt/models/NLModel.nlogo
-RUN mv /opt/models/$MODEL_FOLDER/experiment.xml /opt/models/experiment.xml
-RUN mv /opt/models/$MODEL_FOLDER/input.csv /opt/models/input.csv
 
 CMD python3 run.py
