@@ -8,8 +8,8 @@ to setup
   clear-all
   reset-ticks
   file-close
-  file-open "input.csv"
-  set datainput csv:from-file "input.csv"
+  file-open input-name
+  set datainput csv:from-file input-name
 
   ask patches [
     set pcolor one-of [white pink]
@@ -117,6 +117,17 @@ NIL
 NIL
 NIL
 1
+
+INPUTBOX
+151
+194
+388
+254
+input-name
+plansza1.csv
+1
+0
+String
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -469,8 +480,27 @@ NetLogo 6.3.0
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="100"/>
-    <exitCondition>count patches with [pcolor = pink] = 0</exitCondition>
-    <metric>count patches with [pcolor = pink]</metric>
+    <enumeratedValueSet variable="world-width">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="world-height">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="min-pxcor">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-pxcor">
+      <value value="99"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="min-pycor">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-pycor">
+      <value value="99"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="input-name">
+      <value value="&quot;plansza1.csv&quot;"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
