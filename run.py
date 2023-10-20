@@ -6,8 +6,8 @@ MODEL_NAME = 'GameOfLife'
 EXPERIMENT_LAYOUT_FILE='exp_layout.xml'
 EXPERIMENT_FILE='experiment.xml'
 
-MAX_ITER=100 # max nr of iterations
-REPETITIONS = 5
+MAX_ITER=10000 # max nr of iterations
+REPETITIONS = 10000
 
 directory = os.getcwd()
 
@@ -32,7 +32,7 @@ def create_experiment_netlogo(INPUT_NAME):
             exp_file.truncate(0)
             exp_file.write(data)
 
-input_names = ['10x10board.csv', '100x100board.csv', '1000x1000board.csv']
+input_names = ['10x10board.csv']
 # input_names = ['10x10board.csv', '100x100board.csv']
 # input_names = ['1000x1000board.csv']
 for input in input_names:
@@ -48,4 +48,4 @@ for input in input_names:
         )
 
     end = time.time()
-    print((end - start)/REPETITIONS)
+    print((end - start)/(REPETITIONS*MAX_ITER))
