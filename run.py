@@ -6,8 +6,8 @@ MODEL_NAME = 'GameOfLife'
 EXPERIMENT_LAYOUT_FILE='exp_layout.xml'
 EXPERIMENT_FILE='experiment.xml'
 
-MAX_ITER=10000 # max nr of iterations
-REPETITIONS = 10000
+MAX_ITER=100 # max nr of iterations
+REPETITIONS = 10
 
 directory = os.getcwd()
 
@@ -48,4 +48,7 @@ for input in input_names:
         )
 
     end = time.time()
-    print((end - start)/(REPETITIONS*MAX_ITER))
+    print("input: {}, rep: {}, iterations: {}".format(input, REPETITIONS, MAX_ITER))
+    print("1 iteration time:",(end - start)/(REPETITIONS*MAX_ITER))
+    print("Total time: ", (end - start))
+    print("---")

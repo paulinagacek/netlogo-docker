@@ -5,5 +5,5 @@
     ```
 2. Run container
     ```docker
-        sudo docker run netlogo
+        sudo docker run netlogo >> netlogo_logs.txt
     ```
