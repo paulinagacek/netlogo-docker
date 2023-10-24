@@ -3,7 +3,6 @@ extensions [csv]
 patches-own [
   is-wall?
   is-exit?
-  is-occupied?
   field-value
 ]
 
@@ -36,7 +35,6 @@ to setup-patches
     set field-value -1
     set is-wall? false
     set is-exit? false
-    set is-occupied? false
 
     set pcolor white
     if-else (item pxcor item pycor datainput) = 1 [
@@ -52,7 +50,6 @@ to setup-patches
       ][
         if (item pxcor item pycor datainput) = 3 [
           set initial-agents-positions lput self initial-agents-positions
-          set is-occupied? true
         ]
       ]
     ]
@@ -78,7 +75,6 @@ to compute-static-field
         ask neighbors [
           if (not is-wall?) and (field-value = -1 or ( field-value > ( current-field-value + 1 ) )) [
             set field-value current-field-value + 1
-            ;; set pcolor scale-color pink field-value 1 50
             set new-queue lput self new-queue
           ]
         ]
@@ -96,24 +92,15 @@ to start
     let min-field-val [field-value] of patch-here
     let next-patch patch-here
     ask neighbors [
-      if not is-wall? and not is-occupied? and  field-value < min-field-val [
+      if not is-wall? and ( count turtles-here = 0 ) and  field-value < min-field-val [
         set min-field-val field-value
         set next-patch self
       ]
     ]
 
-    ask patch-here [
-      set is-occupied? false
-    ]
-
-    ask next-patch [
-      set is-occupied? true
-    ]
-
     move-to next-patch
 
     if [is-exit?] of next-patch [
-      set is-occupied? false
       die
     ]
 
