@@ -2,7 +2,7 @@ import time, subprocess
 import pandas as pd, os
 
 MODEL_FOLDER='/opt/models'
-MODEL_NAME = 'GameOfLife'
+MODEL_NAME = 'Ants'
 EXPERIMENT_LAYOUT_FILE='exp_layout.xml'
 EXPERIMENT_FILE='experiment.xml'
 

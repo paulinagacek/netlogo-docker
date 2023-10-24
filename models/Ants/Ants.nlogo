@@ -1,77 +1,257 @@
-extensions [csv]
-patches-own [new-color]
-globals[
-  datainput
+globals [
+  nest-x-red
+  nest-y-red
+  nest-y-black
+  nest-x-black
+  food-size
+  food-source-x
+  food-source-y
+  ticks-to-give-food
+  board-size
+  population-size
+  nest-dist
+  diffusion-rate
+  evaporation-rate
+]
+
+breed [red-ants red-ant]
+breed [black-ants black-ant]
+
+patches-own [
+  red-nest?            ;; true on red-nest patches
+  black-nest?          ;; true on black-nest patches
+  red-pheromone
+  black-pheromone
+  food                 ;; amount of food on the patch 0 to 2
+  red-nest-scent       ;; the closest to the nest the higher
+  black-nest-scent
+]
+
+red-ants-own[
+  has-food?
+]
+
+black-ants-own[
+  has-food?
 ]
 
 to setup
   clear-all
+  setup-params
+  setup-patches
+  setup-population
   reset-ticks
-  file-close
-  file-open input-name
-  set datainput csv:from-file input-name
+end
 
-  ask patches [
-    set pcolor white
-    if (item pxcor item pycor datainput) = 1 [
-      set pcolor pink
+to setup-params
+  set board-size (max-pxcor - min-pxcor + 1)
+  set diffusion-rate 88
+  set evaporation-rate 5
+end
+
+to setup-population
+  set population-size ( 0.005 * board-size * board-size)
+  create-red-ants population-size
+  [ set size 2
+    set color red
+    set shape "bug"
+    setxy nest-x-red nest-y-red
+    set has-food? false
+  ]
+  create-black-ants population-size
+  [ set size 2
+    set color blue
+    set shape "bug"
+    setxy nest-x-black nest-y-black
+    set has-food? false
+  ]
+end
+
+to setup-patches
+  ask patches
+  [ setup-nest ]
+  add-food-point
+  ask patches
+  [recolor-patch]
+end
+
+to setup-nest
+  set nest-dist  (0.1 * board-size)
+  set nest-x-red (min-pxcor + nest-dist)
+  set nest-y-red (min-pycor + nest-dist)
+  set red-nest? (distancexy nest-x-red nest-y-red) < 1
+  set red-nest-scent ((board-size * 1.5) - distancexy nest-x-red nest-y-red) ;; spread nest-scent over the world
+
+  set nest-x-black (max-pxcor - nest-dist)
+  set nest-y-black (max-pycor - nest-dist)
+  set black-nest? (distancexy nest-x-black nest-y-black) < 1
+  set black-nest-scent (((board-size * 1.5) - distancexy nest-x-black nest-y-black))
+  set ticks-to-give-food 500
+end
+
+to add-food-point
+  set food-size one-of [ 3 4]
+    ask one-of patches [
+    if not red-nest? and not black-nest?[
+      set food 2
+      set food-source-x pxcor
+      set food-source-y pycor
+      ]
     ]
+    if food-source-x > -100 [
+      ask patches with [(distancexy (food-source-x) food-source-y) < food-size][
+        set food 1
+      ]
+    ]
+end
+
+to recolor-patch
+  ifelse red-nest? or black-nest?
+  [ set pcolor violet ]
+  [ ifelse food > 0
+    [ set pcolor brown ]
+      [ ifelse red-pheromone > black-pheromone
+      [ set pcolor scale-color pink red-pheromone 0.1 60]
+      [ set pcolor scale-color blue black-pheromone 0.1 60]
+      ]
   ]
 end
 
 to go
-  tick
-  ask patches [
-    let num-live-neighbors count (neighbors with [pcolor = pink])
-    set new-color pcolor
-    if-else (pcolor = pink)[
-      if (num-live-neighbors < 2 or num-live-neighbors > 3)[
-        set new-color white
-      ]
-    ][
-      if(num-live-neighbors = 3)[
-        set new-color pink
-      ]
-    ]
+  ask red-ants
+  [ ifelse has-food?
+    [ return-to-red-nest ]   ;; carrying food? take it back to nest
+    [ look-for-food-red ]    ;; not carrying food? look for it
+    wiggle
+    fd 1 ]
+  ask black-ants
+  [ ifelse has-food?
+    [ return-to-black-nest ]   ;; carrying food? take it back to nest
+    [ look-for-food-black ]    ;; not carrying food? look for it
+    wiggle
+    fd 1
   ]
 
-  ask patches[
-    set pcolor new-color
+  diffuse black-pheromone (diffusion-rate / 100)
+  diffuse red-pheromone (diffusion-rate / 100) ;; get neighbours 1/8 from (diffusion-rate / 100) * pheromone
+
+
+  ask patches
+  [ set red-pheromone red-pheromone * (100 - evaporation-rate / 5) / 100  ;; slowly evaporate pheromone
+    set black-pheromone black-pheromone * (100 - evaporation-rate / 5) / 100
+    recolor-patch ]
+  if ticks > 0 and ( ticks mod ticks-to-give-food = 0 ) [ ;; generate new piece of food
+    add-food-point
   ]
+  tick
+end
+
+to return-to-red-nest
+  ifelse red-nest?
+  [ set has-food? false ;; drop food and head out again
+    rt 180 ]
+  [ set red-pheromone ( red-pheromone + 60 )  ;; drop some pheromone
+    uphill-red-nest-scent ]         ;; head toward the greatest value of nest-scent
+end
+
+to return-to-black-nest
+  ifelse black-nest?
+  [ set has-food? false ;; drop food and head out again
+    lt 180 ]
+  [ set black-pheromone ( black-pheromone + 60 ) ;; drop some pheromone
+    uphill-black-nest-scent ]         ;; head toward the greatest value of nest-scent
+end
+
+to look-for-food-red
+  if food > 0
+  [ set has-food? true       ;; pick up food
+    set food ( food - 1 )    ;; and reduce the food source
+    rt 180                   ;; and turn around
+    stop ]
+  ;; go in the direction where the pheromone smell is strongest
+  if (red-pheromone >= 0.15) and (red-pheromone < 2)
+  [ uphill-red-nest-scent ]
+end
+
+to look-for-food-black
+  if food > 0
+  [ set has-food? true       ;; pick up food
+    set food ( food - 1 )    ;; and reduce the food source
+    rt 180                   ;; and turn around
+    stop ]
+  if (black-pheromone >= 0.15) and (black-pheromone < 2)
+  [ uphill-black-nest-scent ]
+end
+
+to uphill-red-nest-scent
+  let scent-ahead red-nest-scent-at-angle   0
+  let scent-right red-nest-scent-at-angle  45
+  let scent-left  red-nest-scent-at-angle -45
+  if (scent-right > scent-ahead) or (scent-left > scent-ahead)
+  [ ifelse scent-right > scent-left
+    [ rt 45 ]
+    [ lt 45 ] ]
+end
+
+to uphill-black-nest-scent
+  let scent-ahead black-nest-scent-at-angle   0
+  let scent-right black-nest-scent-at-angle  45
+  let scent-left  black-nest-scent-at-angle -45
+  if (scent-right > scent-ahead) or (scent-left > scent-ahead)
+  [ ifelse scent-right > scent-left
+    [ rt 45 ]
+    [ lt 45 ] ]
+end
+
+to wiggle
+  rt one-of [-45 0 45]
+  if not can-move? 1 [ rt 180 ]
+end
+
+to-report red-nest-scent-at-angle [angle]
+  let p patch-right-and-ahead angle 1
+  if p = nobody [ report 0 ]
+  report [red-nest-scent] of p
+end
+
+to-report black-nest-scent-at-angle [angle]
+  let p patch-right-and-ahead angle 1
+  if p = nobody [ report 0 ]
+  report [black-nest-scent] of p
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
-1218
-1019
+1223
+1024
 -1
 -1
-10.0
+5.0
 1
 10
 1
 1
 1
 0
+0
+0
+1
+-100
+100
+-100
+100
 1
 1
-1
-0
-99
-0
-99
-0
-0
 1
 ticks
 30.0
 
 BUTTON
-14
-22
-77
-55
+6
+242
+69
+275
 setup
 setup
 NIL
@@ -85,28 +265,11 @@ NIL
 1
 
 BUTTON
-90
-22
-153
-55
-play
+81
+243
+144
+276
 go
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-26
-71
-126
-104
-play forever
 go
 T
 1
@@ -117,17 +280,6 @@ NIL
 NIL
 NIL
 1
-
-INPUTBOX
-151
-194
-388
-254
-input-name
-plansza1.csv
-1
-0
-String
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -475,34 +627,6 @@ NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
-<experiments>
-  <experiment name="exp1" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="100"/>
-    <enumeratedValueSet variable="world-width">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="world-height">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="min-pxcor">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-pxcor">
-      <value value="99"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="min-pycor">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-pycor">
-      <value value="99"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="input-name">
-      <value value="&quot;plansza1.csv&quot;"/>
-    </enumeratedValueSet>
-  </experiment>
-</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default

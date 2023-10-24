@@ -1,50 +1,130 @@
 extensions [csv]
-patches-own [new-color]
-globals[
+
+patches-own [
+  is-wall?
+  is-exit?
+  is-occupied?
+  field-value
+]
+
+globals [
   datainput
+  input-name
+  max-value
+  queue
+  initial-agents-positions
 ]
 
 to setup
   clear-all
   reset-ticks
+  setup-patches
+  set-up-pedestrians
+end
+
+to setup-patches
+  set max-value max-pxcor * max-pycor
+  set input-name "board_1_50.csv"
   file-close
   file-open input-name
   set datainput csv:from-file input-name
 
-  ask patches [
+  set queue []
+  set initial-agents-positions []
+
+  ask patches[
+    set field-value -1
+    set is-wall? false
+    set is-exit? false
+    set is-occupied? false
+
     set pcolor white
-    if (item pxcor item pycor datainput) = 1 [
-      set pcolor pink
+    if-else (item pxcor item pycor datainput) = 1 [
+      set is-wall? true
+      set pcolor yellow
+      set field-value max-value
+    ][
+      if-else (item pxcor item pycor datainput) = 2 [
+        set is-exit? true
+        set pcolor pink
+        set queue lput self queue
+        set field-value 0
+      ][
+        if (item pxcor item pycor datainput) = 3 [
+          set initial-agents-positions lput self initial-agents-positions
+          set is-occupied? true
+        ]
+      ]
+    ]
+  ]
+  compute-static-field
+end
+
+to set-up-pedestrians
+  foreach initial-agents-positions [
+    pos -> create-turtles 1 [
+      set xcor [pxcor] of pos
+      set ycor [pycor] of pos
     ]
   ]
 end
 
-to go
-  tick
-  ask patches [
-    let num-live-neighbors count (neighbors with [pcolor = pink])
-    set new-color pcolor
-    if-else (pcolor = pink)[
-      if (num-live-neighbors < 2 or num-live-neighbors > 3)[
-        set new-color white
-      ]
-    ][
-      if(num-live-neighbors = 3)[
-        set new-color pink
+to compute-static-field
+  while [length queue > 0] [
+    let new-queue []
+    foreach queue [
+      p -> ask p [
+        let current-field-value field-value
+        ask neighbors [
+          if (not is-wall?) and (field-value = -1 or ( field-value > ( current-field-value + 1 ) )) [
+            set field-value current-field-value + 1
+            ;; set pcolor scale-color pink field-value 1 50
+            set new-queue lput self new-queue
+          ]
+        ]
       ]
     ]
+    set queue new-queue
   ]
+end
 
-  ask patches[
-    set pcolor new-color
+
+to start
+  tick
+  ask turtles [
+
+    let min-field-val [field-value] of patch-here
+    let next-patch patch-here
+    ask neighbors [
+      if not is-wall? and not is-occupied? and  field-value < min-field-val [
+        set min-field-val field-value
+        set next-patch self
+      ]
+    ]
+
+    ask patch-here [
+      set is-occupied? false
+    ]
+
+    ask next-patch [
+      set is-occupied? true
+    ]
+
+    move-to next-patch
+
+    if [is-exit?] of next-patch [
+      set is-occupied? false
+      die
+    ]
+
   ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
-1218
-1019
+718
+519
 -1
 -1
 10.0
@@ -58,9 +138,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-99
+49
 0
-99
+49
 0
 0
 1
@@ -68,10 +148,10 @@ ticks
 30.0
 
 BUTTON
-14
-22
-77
-55
+17
+27
+80
+60
 setup
 setup
 NIL
@@ -85,30 +165,13 @@ NIL
 1
 
 BUTTON
-90
-22
-153
-55
-play
-go
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
+96
 26
-71
-126
-104
-play forever
-go
-T
+159
+59
+start
+start
+NIL
 1
 T
 OBSERVER
@@ -118,16 +181,22 @@ NIL
 NIL
 1
 
-INPUTBOX
-151
-194
-388
-254
-input-name
-plansza1.csv
+BUTTON
+62
+75
+140
+108
+NIL
+start
+T
 1
-0
-String
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -475,34 +544,6 @@ NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
-<experiments>
-  <experiment name="exp1" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="100"/>
-    <enumeratedValueSet variable="world-width">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="world-height">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="min-pxcor">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-pxcor">
-      <value value="99"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="min-pycor">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-pycor">
-      <value value="99"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="input-name">
-      <value value="&quot;plansza1.csv&quot;"/>
-    </enumeratedValueSet>
-  </experiment>
-</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
