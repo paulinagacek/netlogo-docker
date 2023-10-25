@@ -23,7 +23,7 @@ end
 
 to setup-patches
   set max-value max-pxcor * max-pycor
-  set input-name "board_1_50.csv"
+  set input-name "board_3_100.csv"
   file-close
   file-open input-name
   set datainput csv:from-file input-name
@@ -110,11 +110,11 @@ end
 GRAPHICS-WINDOW
 210
 10
-718
-519
+1018
+819
 -1
 -1
-10.0
+8.0
 1
 10
 1
@@ -125,9 +125,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-49
+99
 0
-49
+99
 0
 0
 1
