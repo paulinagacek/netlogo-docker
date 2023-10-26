@@ -8,7 +8,6 @@ patches-own [
 
 globals [
   datainput
-  input-name
   max-value
   queue
   initial-agents-positions
@@ -24,7 +23,6 @@ end
 
 to setup-patches
   set max-value max-pxcor * max-pycor
-  set input-name "board_3_100.csv"
   file-close
   file-open input-name
   set datainput csv:from-file input-name
@@ -114,8 +112,8 @@ end
 GRAPHICS-WINDOW
 210
 10
-718
-519
+318
+119
 -1
 -1
 1.0
@@ -129,9 +127,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-499
+99
 0
-499
+99
 0
 0
 1
@@ -160,8 +158,8 @@ BUTTON
 26
 159
 59
-start
-start
+go
+go
 NIL
 1
 T
@@ -177,8 +175,8 @@ BUTTON
 75
 140
 108
-NIL
-start
+go
+go
 T
 1
 T
@@ -188,6 +186,17 @@ NIL
 NIL
 NIL
 1
+
+INPUTBOX
+20
+200
+257
+260
+input-name
+board_3_100.csv
+1
+0
+String
 
 @#$#@#$#@
 ## WHAT IS IT?
