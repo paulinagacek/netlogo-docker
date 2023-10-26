@@ -2,6 +2,7 @@ extensions [csv]
 patches-own [new-color]
 globals[
   datainput
+  grid-size
 ]
 
 to setup
@@ -10,6 +11,8 @@ to setup
   file-close
   file-open input-name
   set datainput csv:from-file input-name
+  set grid-size length datainput
+  resize-world 0 (grid-size - 1) 0 (grid-size - 1)
 
   ask patches [
     set pcolor white
@@ -43,8 +46,8 @@ end
 GRAPHICS-WINDOW
 210
 10
-1218
-1019
+318
+119
 -1
 -1
 10.0
@@ -58,9 +61,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-99
+9
 0
-99
+9
 0
 0
 1
@@ -124,7 +127,7 @@ INPUTBOX
 388
 254
 input-name
-plansza1.csv
+10x10board.csv
 1
 0
 String

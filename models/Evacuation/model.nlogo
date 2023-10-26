@@ -12,6 +12,7 @@ globals [
   max-value
   queue
   initial-agents-positions
+  grid-size
 ]
 
 to setup
@@ -27,6 +28,8 @@ to setup-patches
   file-close
   file-open input-name
   set datainput csv:from-file input-name
+  set grid-size length datainput
+  resize-world 0 (grid-size - 1) 0 (grid-size - 1)
 
   set queue []
   set initial-agents-positions []
@@ -85,7 +88,8 @@ to compute-static-field
 end
 
 
-to start
+to go
+  if count turtles = 0 [stop]
   tick
   ask turtles [
 
@@ -110,11 +114,11 @@ end
 GRAPHICS-WINDOW
 210
 10
-1018
-819
+718
+519
 -1
 -1
-8.0
+1.0
 1
 10
 1
@@ -125,9 +129,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-99
+499
 0
-99
+499
 0
 0
 1

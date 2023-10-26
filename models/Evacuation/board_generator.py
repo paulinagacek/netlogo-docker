@@ -57,6 +57,33 @@ def add_middle_wall_2(board):
         int(board.shape[0] // 4), board.shape[0] // 4 + 1 : int(board.shape[0] * 0.7)
     ] = np.ones((int(board.shape[0] * 0.7) - board.shape[0] // 4 - 1))
 
+    board = draw_horizontal(board, (0.4, 0.6), 0.3)
+    board = draw_horizontal(board, (0.4, 0), 0.4)
+    board = draw_horizontal(board, (0.6, 0), 0.2)
+    board = draw_horizontal(board, (0.8, 0.1), 0.3)
+
+    board = draw_vertical(board, (0.4, 0.05), 0.15)
+    board = draw_vertical(board, (0.45, 0.1), 0.15)
+    board = draw_vertical(board, (0.2, 0.15), 0.35)
+
+    board = draw_horizontal(board, (0.2, 0.15), 0.4)
+    board = draw_horizontal(board, (0.15, 0.4), 0.4)
+    board = draw_horizontal(board, (0.1, 0.0), 0.6)
+    board = draw_horizontal(board, (0.05, 0.4), 0.4)
+
+    board = draw_vertical(board, (0.35, 0.95), 0.35)
+    board = draw_vertical(board, (0.45, 0.86), 0.35)
+    board = draw_horizontal(board, (0.3, 0.8), 0.18)
+
+    board = draw_vertical(board, (0.5, 0.7), 0.15)
+    board = draw_vertical(board, (0.55, 0.65), 0.4)
+    board = draw_vertical(board, (0.5, 0.6), 0.15)
+    board = draw_vertical(board, (0.55, 0.55), 0.35)
+    board = draw_vertical(board, (0.5, 0.5), 0.15)
+
+    board = draw_vertical(board, (0.8, 0.5), 0.2)
+    board = draw_vertical(board, (0.8, 0.6), 0.2)
+
     return board
 
 
@@ -233,5 +260,5 @@ def save_to_csv(board, filename):
             writer.writerow(row)
 
 
-board = generate_board_3(100)
-save_to_csv(board, "board_3_100.csv")
+board = generate_board_2(500)
+save_to_csv(board, "board_2_500.csv")
